@@ -53,6 +53,14 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
     def clean_transaction(transaction):
         transaction = filter(lambda v: v in items, transaction)
         transaction.sort(key=lambda v: items[v], reverse=True)
+       #### ## I think sort should be the flowing, if use ori_way, when trans are :
+       ####### #raw='25,48;25,48'
+       ######## or  raw = '25,52,48,274;71;71,274,33;52;25,52,48;274,71,33'
+       ########it has bugs
+        ##def f2(v):
+        ##    return items[v]+float(v)*0.1;
+        ##transaction.sort(key=lambda v:f2(v),reverse=True)
+        ########
         return transaction
 
     master = FPTree()
