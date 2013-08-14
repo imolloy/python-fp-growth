@@ -50,9 +50,13 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
     # Build our FP-tree. Before any transactions can be added to the tree, they
     # must be stripped of infrequent items and their surviving items must be
     # sorted in decreasing order of frequency.
+    def f2(v):
+        return items[v]-1/float(v);
     def clean_transaction(transaction):
         transaction = filter(lambda v: v in items, transaction)
-        transaction.sort(key=lambda v: items[v], reverse=True)
+        #original sort will caused a bug
+        #when the transactions are:{25,48;48,25} and mini-support is 2;it could not find (25,48)
+        transaction.sort(key=lambda v: f2(v), reverse=True)
         return transaction
 
     master = FPTree()
@@ -236,14 +240,9 @@ def conditional_tree_from_paths(paths, minimum_support):
         for node in reversed(path[:-1]):
             node._count += count
 
-    # Eliminate the nodes for any items that are no longer frequent.
-    for item in items:
-        support = sum(n.count for n in tree.nodes(item))
-        if support < minimum_support:
-            # Doesn't make the cut anymore
-            for node in tree.nodes(item):
-                if node.parent is not None:
-                    node.parent.remove(node)
+    #this fraction is wrong，it may caused a bug
+    # when the transactions are: raw = '25,52,48,274;71;71,274,33;52;25,52,48;274,71,33'
+    #it gives wrong answer ([25,48],3) , the support of [25,48] actually is 2
 
     # Finally, remove the nodes corresponding to the item for which this
     # conditional tree was generated.
