@@ -51,11 +51,13 @@ def find_frequent_itemsets(transactions, minimum_support, include_support=False)
     # must be stripped of infrequent items and their surviving items must be
     # sorted in decreasing order of frequency.
     def f2(v):
-        return items[v]-1/float(v);
+        # I believe the correct sorting is reverse by frequency, but the items must always appear in the same order
+        return items[v],v
     def clean_transaction(transaction):
         transaction = filter(lambda v: v in items, transaction)
         #original sort will caused a bug
         #when the transactions are:{25,48;48,25} and mini-support is 2;it could not find (25,48)
+        # The issue is actually that it must be sorted / in the same order...
         transaction.sort(key=lambda v: f2(v), reverse=True)
         return transaction
 
